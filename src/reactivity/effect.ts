@@ -1,13 +1,13 @@
 class ReactiveEffect {
-  private fn: any
+  private _fn: any
 
   constructor(fn) {
-    this.fn = fn
+    this._fn = fn
   }
 
   run() {
     activeEffect = this
-    this.fn()
+    return this._fn()
   }
 }
 
@@ -42,4 +42,5 @@ let activeEffect;
 export function effect(fn) {
   const _effect = new ReactiveEffect(fn)
   _effect.run()
+  return _effect.run.bind(_effect)
 }
