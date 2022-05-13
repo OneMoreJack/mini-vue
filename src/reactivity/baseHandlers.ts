@@ -1,4 +1,5 @@
 import { track, trigger } from "./effect"
+import { ReactiveFlags } from "./reactive"
 
 export function createSetter() {
   return function setter(target: any, key: string | symbol, value: any) {
@@ -10,6 +11,12 @@ export function createSetter() {
 
 export function createGetter(isReadonly = false) {
   return function getter(target: any, key: string | symbol) {
+    if (key === ReactiveFlags.IS_REACTIVE) {
+      return !isReadonly
+    } else if (key === ReactiveFlags.IS_READONLY) {
+      return isReadonly
+    }
+    
     const value = Reflect.get(target, key)
     if (!isReadonly) {
       track(target, key)
