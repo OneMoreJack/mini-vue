@@ -1,13 +1,6 @@
+import { isObject } from "../shared"
 import { track, trigger } from "./effect"
-import { ReactiveFlags } from "./reactive"
-
-export function createSetter() {
-  return function setter(target: any, key: string | symbol, value: any) {
-    Reflect.set(target, key, value)
-    trigger(target, key)
-    return true
-  }
-}
+import { reactive, ReactiveFlags, readonly } from "./reactive"
 
 export function createGetter(isReadonly = false) {
   return function getter(target: any, key: string | symbol) {
@@ -16,12 +9,25 @@ export function createGetter(isReadonly = false) {
     } else if (key === ReactiveFlags.IS_READONLY) {
       return isReadonly
     }
-    
+
     const value = Reflect.get(target, key)
+
+    if (isObject(value)) {
+      return isReadonly ? readonly(value) : reactive(value)
+    }
+
     if (!isReadonly) {
       track(target, key)
     }
     return value
+  }
+}
+
+export function createSetter() {
+  return function setter(target: any, key: string | symbol, value: any) {
+    Reflect.set(target, key, value)
+    trigger(target, key)
+    return true
   }
 }
 

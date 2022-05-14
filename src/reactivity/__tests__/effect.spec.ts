@@ -26,6 +26,16 @@ describe('effect', () => {
     expect(nextAge).toBe(12)
   })
 
+  it('should observe nested properties', () => {
+    let dummy
+    const counter = reactive({ nested: { num: 0 } })
+    effect(() => (dummy = counter.nested.num))
+
+    expect(dummy).toBe(0)
+    counter.nested.num = 8
+    expect(dummy).toBe(8)
+  })
+
   it('should return runner', () => {
     let foo = 10;
     const runner = effect(() => {
